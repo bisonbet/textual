@@ -1,12 +1,14 @@
 # Textual
-<!-- TODO: CI badge -->
-<!-- TODO: SPI badges -->
+[![CI](https://github.com/gonzalezreal/textual/workflows/CI/badge.svg)](https://github.com/gonzalezreal/textual/actions?query=workflow%3ACI)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fgonzalezreal%2Ftextual%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/gonzalezreal/textual)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fgonzalezreal%2Ftextual%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/gonzalezreal/textual)
 
 Render and customize rich attributed text in SwiftUI.
 
 - [Overview](#overview)
 - [Getting Started](#getting-started)
 - [Demos](#demos)
+- [Documentation](#documentation)
 - [Installation](#installation)
 - [License](#license)
 
@@ -285,6 +287,10 @@ to explore and reference.
 
 The demo lives in [`Examples/TextualDemo`](./Examples/TextualDemo) and is included in `Textual.xcworkspace` at the
 repository root. Open the workspace to browse the library source and run the demo side-by-side.
+
+## Documentation
+
+The latest documentation for Textual is available [here](https://swiftpackageindex.com/gonzalezreal/textual/main/documentation/textual).
 
 ## Installation
 
