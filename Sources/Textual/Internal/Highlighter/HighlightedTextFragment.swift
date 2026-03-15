@@ -29,13 +29,13 @@ struct HighlightedTextFragment: View {
   }
 
   var body: some View {
+    // Convert to an owned String before the async boundary
+    let code = String(content.characters[...])
+
     TextFragment(model.highlightedCode ?? AttributedString(content))
       .foregroundStyle(theme.foregroundColor)
-      .task(id: content) {
-        await model.tokenize(
-          content: content,
-          languageHint: languageHint
-        )
+      .task(id: code) {
+        await model.tokenize(code: code, languageHint: languageHint, theme: theme)
       }
       .onChange(of: Tuple(model.tokens, textEnvironment)) { _, newValue in
         model.highlight(
