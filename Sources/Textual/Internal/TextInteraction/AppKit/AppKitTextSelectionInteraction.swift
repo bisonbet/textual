@@ -26,6 +26,11 @@
         // We need the selection model at text fragment level for the
         // text selection background and selected attachment dimming
         .environment(model)
+        // Resolve geometry before distributing to the NSView overlay. Without
+        // this, animated container resizes (e.g. NavigationSplitView sidebar
+        // collapse) can leave the NSTextInteractionView with a stale frame,
+        // causing it to intercept mouse events outside its visible bounds.
+        .geometryGroup()
         .overlayPreferenceValue(OverflowFrameKey.self) { frames in
           AppKitTextInteractionOverlay(model: model, overflowFrames: frames)
             .onContinuousHover { phase in
