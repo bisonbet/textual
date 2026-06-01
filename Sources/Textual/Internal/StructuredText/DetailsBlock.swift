@@ -6,6 +6,10 @@ extension StructuredText {
     private let bodyMarkdown: String
 
     #if !os(watchOS) && !os(tvOS)
+      // Expansion state is bound to this view's structural identity in its
+      // enclosing ForEach (keyed by index). If blocks are reordered above,
+      // expansion may shift to a neighbouring block. Lifting this to a
+      // content-keyed environment store would fix it but is out of scope here.
       @State private var isExpanded = false
     #endif
 
