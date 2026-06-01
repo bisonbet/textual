@@ -143,7 +143,9 @@ struct MermaidDiagram: Sendable {
         #endif
 
         let diagram = MermaidDiagram(cgImage: cgImage, size: diagramSize)
-        cache.setObject(Box(diagram), forKey: cacheKeyString)
+        // Bitmap cost in bytes so NSCache can evict by actual memory weight.
+        let cost = cgImage.bytesPerRow * cgImage.height
+        cache.setObject(Box(diagram), forKey: cacheKeyString, cost: cost)
         return diagram
       } catch {
         logger.error("MermaidRenderer: \(error.localizedDescription)")
@@ -155,8 +157,7 @@ struct MermaidDiagram: Sendable {
 
     private func ensureReady(theme: String) async {
       if isReady {
-        let js = "initMermaid('\(theme)', \(theme == "dark"))"
-        _ = try? await webView?.evaluateJavaScript(js)
+        await applyTheme(theme)
         return
       }
 
@@ -164,8 +165,7 @@ struct MermaidDiagram: Sendable {
         await withCheckedContinuation { continuation in
           readyContinuations.append(continuation)
         }
-        let js = "initMermaid('\(theme)', \(theme == "dark"))"
-        _ = try? await webView?.evaluateJavaScript(js)
+        await applyTheme(theme)
         return
       }
 
@@ -198,8 +198,20 @@ struct MermaidDiagram: Sendable {
         readyContinuations.append(continuation)
       }
 
-      let js = "initMermaid('\(theme)', \(theme == "dark"))"
-      _ = try? await wv.evaluateJavaScript(js)
+      await applyTheme(theme)
+    }
+
+    // Invokes `initMermaid` in the page via callAsyncJavaScript so the theme
+    // string travels as an argument rather than being interpolated into JS
+    // source. Today the only callers pass "default" or "dark", but the
+    // argument-based path closes the door on injection if that ever changes.
+    private func applyTheme(_ theme: String) async {
+      guard let webView else { return }
+      _ = try? await webView.callAsyncJavaScript(
+        "initMermaid(theme, darkMode);",
+        arguments: ["theme": theme, "darkMode": theme == "dark"],
+        contentWorld: .page
+      )
     }
 
     // MARK: - WKNavigationDelegate
@@ -222,6 +234,10 @@ struct MermaidDiagram: Sendable {
       Task { @MainActor in
         logger.error("MermaidRenderer: Navigation failed: \(error.localizedDescription)")
         isReady = false
+        // Drop the failed WebView so the next ensureReady call can build a
+        // fresh one. Without this, a transient init failure would leave the
+        // renderer permanently stuck on a never-firing navigation callback.
+        self.webView = nil
         for continuation in readyContinuations {
           continuation.resume()
         }

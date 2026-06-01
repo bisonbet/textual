@@ -194,5 +194,50 @@ struct MermaidCodeBlockTests {
         #expect(diagram.size.height > 0)
       }
     }
+
+    // Two concurrent renders of different sources must both succeed — the
+    // shared render lock serializes them through the same WebView without
+    // corrupting each other's output.
+    @Test @MainActor func rendererHandlesConcurrentRenders() async {
+      async let first = MermaidRenderer.shared.render(
+        source: "flowchart LR\n    Concurrent1 --> Done",
+        width: 400
+      )
+      async let second = MermaidRenderer.shared.render(
+        source: "flowchart LR\n    Concurrent2 --> Done",
+        width: 400
+      )
+
+      let (a, b) = await (first, second)
+      #expect(a != nil)
+      #expect(b != nil)
+      if let a, let b {
+        #expect(a.cgImage !== b.cgImage)
+      }
+    }
+
+    // Rendering the same source twice with different themes must succeed for
+    // both — exercises applyTheme between calls and confirms cache keys
+    // include theme so each variant gets its own entry.
+    @Test @MainActor func rendererHandlesThemeToggle() async {
+      let source = "flowchart LR\n    Light --> Dark"
+
+      let light = await MermaidRenderer.shared.render(
+        source: source,
+        width: 400,
+        theme: "default"
+      )
+      let dark = await MermaidRenderer.shared.render(
+        source: source,
+        width: 400,
+        theme: "dark"
+      )
+
+      #expect(light != nil)
+      #expect(dark != nil)
+      if let light, let dark {
+        #expect(light.cgImage !== dark.cgImage)
+      }
+    }
   #endif
 }
