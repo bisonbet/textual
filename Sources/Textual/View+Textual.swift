@@ -159,6 +159,24 @@ extension TextualNamespace where Base: View {
     #endif
   }
 
+  /// Excludes this view's frame from text selection hit-testing.
+  ///
+  /// Use this modifier on interactive elements (like buttons) embedded in ``StructuredText``
+  /// content to ensure they receive mouse/touch events instead of the text selection overlay.
+  @available(tvOS, unavailable)
+  @available(watchOS, unavailable)
+  public func interactionPassthrough() -> some View {
+    base.background(
+      GeometryReader { geometry in
+        Color.clear
+          .preference(
+            key: OverflowFrameKey.self,
+            value: [geometry.frame(in: .named("textContainer"))]
+          )
+      }
+    )
+  }
+
   /// Sets the spacing used between table cells in ``StructuredText``.
   public func tableCellSpacing(
     horizontal: CGFloat? = nil,

@@ -10,13 +10,19 @@ extension StructuredText {
       self.content = content
     }
 
+    /// The plain-text source of the code block.
+    public var sourceText: String {
+      String(content.characters[...])
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     /// Copies the code block contents to the system pasteboard.
     ///
     /// Textual writes both a plain-text and an HTML representation when possible.
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public func copyToPasteboard() {
-      #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit)
+      #if TEXTUAL_ENABLE_TEXT_SELECTION && canImport(AppKit) && !targetEnvironment(macCatalyst)
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
 

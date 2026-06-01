@@ -27,7 +27,9 @@ let package = Package(
         .product(name: "SwiftUIMath", package: "swiftui-math"),
       ],
       resources: [
-        .process("Internal/Highlighter/Prism")
+        .process("Internal/Highlighter/Prism"),
+        .process("Internal/MermaidRenderer/mermaid.min.js"),
+        .process("Internal/MermaidRenderer/mermaid-template.html"),
       ],
       swiftSettings: [
         .define("TEXTUAL_ENABLE_LINKS", .when(platforms: [.macOS, .iOS, .watchOS, .visionOS])),

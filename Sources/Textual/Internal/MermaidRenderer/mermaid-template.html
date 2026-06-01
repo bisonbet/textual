@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { margin: 0; padding: 0; }
+  body {
+    background: white;
+    display: inline-block;
+  }
+  #container {
+    display: inline-block;
+  }
+</style>
+<script>MERMAID_JS_PLACEHOLDER</script>
+</head>
+<body>
+<div id="container"></div>
+<script>
+  const mermaidLib = globalThis.mermaid;
+
+  function initMermaid(theme, darkMode) {
+    if (darkMode) {
+      document.body.style.background = 'transparent';
+    } else {
+      document.body.style.background = 'white';
+    }
+    mermaidLib.initialize({
+      startOnLoad: false,
+      theme: theme || 'default',
+      securityLevel: 'strict',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif'
+    });
+  }
+
+  async function renderDiagram(source, containerId) {
+    try {
+      const { svg } = await mermaidLib.render(containerId || 'diagram', source);
+      document.getElementById('container').innerHTML = svg;
+
+      const svgEl = document.querySelector('#container svg');
+      if (svgEl) {
+        const bbox = svgEl.getBBox();
+        const vb = svgEl.viewBox.baseVal;
+        const width = Math.ceil(vb.width || bbox.width + bbox.x * 2 || 400);
+        const height = Math.ceil(vb.height || bbox.height + bbox.y * 2 || 300);
+
+        svgEl.setAttribute('width', width);
+        svgEl.setAttribute('height', height);
+        svgEl.style.width = width + 'px';
+        svgEl.style.height = height + 'px';
+
+        document.body.style.width = width + 'px';
+        document.body.style.height = height + 'px';
+
+        return JSON.stringify({ width: width, height: height });
+      }
+      return JSON.stringify({ error: 'No SVG element found' });
+    } catch (e) {
+      return JSON.stringify({ error: e.message || String(e) });
+    }
+  }
+
+  window.initMermaid = initMermaid;
+  window.renderDiagram = renderDiagram;
+</script>
+</body>
+</html>
