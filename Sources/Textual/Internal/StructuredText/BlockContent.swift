@@ -45,6 +45,12 @@ extension StructuredText {
         OrderedList(intent: intent, content: content)
       case .unorderedList:
         UnorderedList(intent: intent, content: content)
+      case .codeBlock(let languageHint) where languageHint?.hasPrefix("_textual_details:") ?? false:
+        DetailsBlock(
+          content,
+          summary: String((languageHint ?? "").dropFirst("_textual_details:".count))
+            .replacing(/&#96;/, with: "`")
+        )
       case .codeBlock(let languageHint) where languageHint?.lowercased() == "math":
         MathCodeBlock(content)
       case .codeBlock(let languageHint):

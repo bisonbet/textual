@@ -5,6 +5,14 @@ struct StructuredTextDemo: View {
   @State private var wrapCode = false
 
   private let content = """
+    <details>
+    <summary>Gnarly Stack Trace (not from this `code`)</summary>
+    ```
+    cannot open file at line 51058 of [f0ca7bba1c]
+    os_unix.c:51058: (0) open(/private/var/db/DetachedSignatures) - Undefined error: 0
+    Unable to obtain a task name port right for pid 437: (os/kern) failure (0x5)
+    ```
+    </details>
     # Debugging the Navigation Stack :doge:
 
     Yesterday's feature branch looked solid—clean tests, smooth PR review, merged to main. This morning? The entire navigation stack decided to throw a party, and we weren't invited :confused_dog:.

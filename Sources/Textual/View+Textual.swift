@@ -170,6 +170,47 @@ extension TextualNamespace where Base: View {
     )
   }
 
+  /// Marks this view as an interactive control that should receive pointer events
+  /// even when the text-selection overlay is active.
+  ///
+  /// The text-selection overlay in ``StructuredText`` intercepts pointer events to
+  /// handle drag-to-select.  Applying this modifier to an interactive element — such
+  /// as a "Copy" button in a custom ``StructuredText/CodeBlockStyle`` — exempts that
+  /// element's frame from the overlay so clicks reach the underlying view.
+  ///
+  /// Apply the modifier only to the control itself, not to any surrounding region
+  /// that also contains selectable text; doing so would prevent text selection in
+  /// that area.
+  ///
+  /// ```swift
+  /// struct CopyButtonCodeBlockStyle: StructuredText.CodeBlockStyle {
+  ///   func makeBody(configuration: Configuration) -> some View {
+  ///     VStack(alignment: .trailing, spacing: 4) {
+  ///       Button("Copy") { /* copy configuration.code */ }
+  ///         .textual.interactiveRegion()
+  ///       configuration.label
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  @available(tvOS, unavailable)
+  @available(watchOS, unavailable)
+  public func interactiveRegion() -> some View {
+    #if TEXTUAL_ENABLE_TEXT_SELECTION
+      base.background(
+        GeometryReader { geometry in
+          Color.clear
+            .preference(
+              key: OverflowFrameKey.self,
+              value: [geometry.frame(in: .textContainer)]
+            )
+        }
+      )
+    #else
+      base
+    #endif
+  }
+
   /// Controls how content that overflows horizontally behaves in ``Overflow``.
   ///
   /// Use ``OverflowMode/wrap`` to wrap content to the available width, or
