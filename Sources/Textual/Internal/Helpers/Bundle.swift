@@ -33,6 +33,11 @@ extension Bundle {
 
         // For command-line tools.
         Bundle.main.bundleURL,
+
+        // When running `swift test`, the Textual code is linked into the
+        // test xctest, and the SPM-generated `textual_Textual.bundle`
+        // lives as a sibling of that xctest in the build dir.
+        Bundle(for: Token.self).bundleURL.deletingLastPathComponent(),
       ]
 
     for candidate in candidates {
